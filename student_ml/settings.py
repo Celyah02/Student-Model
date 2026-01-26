@@ -49,6 +49,10 @@ DATABASES = {
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
+ROOT_URLCONF = 'student_ml.urls'
+WSGI_APPLICATION = 'student_ml.wsgi.application'
+ASGI_APPLICATION = 'student_ml.asgi.application'
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
