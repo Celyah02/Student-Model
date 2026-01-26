@@ -63,3 +63,50 @@ train()
 
 # Start server
 python manage.py runserver
+
+🔮 Prediction API
+
+Endpoint
+
+POST /api/predict/
+
+
+Request Body
+
+{
+  "hours_studied": 6,
+  "previous_scores": 78,
+  "extracurricular": true,
+  "sleep_hours": 7,
+  "sample_papers": 3
+}
+
+
+Response
+
+{
+  "predicted_performance_index": 72.45
+}
+
+🌍 Deployment Notes
+
+Store the trained model (model.pkl) securely
+
+Use PostgreSQL for production
+
+Serve Django with Gunicorn behind Nginx
+
+📌 Future Improvements
+
+Add model evaluation metrics
+
+Input validation and error handling
+
+Frontend dashboard for predictions
+
+Docker-based deployment
+
+🧑‍💻 Author
+
+FURAHA NIYONGIRA Celia
+Machine Learning & Backend Developer
