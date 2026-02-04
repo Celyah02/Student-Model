@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Performance Predictor</title>
+
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            background: linear-gradient(135deg, #1E3A8A, #2563EB, #3B82F6);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .card {
+            background: #FFFFFF;
+            padding: 35px;
+            width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(30, 58, 138, 0.35);
+            animation: slideUp 0.9s ease-out;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1E3A8A;
+        }
+
+        h2 i {
+            color: #2563EB;
+            margin-right: 8px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .input-group i {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: #64748B;
+            transition: color 0.3s;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 12px 12px 38px;
+            border-radius: 8px;
+            border: 1px solid #CBD5E1;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.35);
+        }
+
+        input:focus + i,
+        select:focus + i {
+            color: #2563EB;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #2563EB, #3B82F6);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.45);
+        }
+
+        button i {
+            margin-right: 6px;
+        }
+
+        .result {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2563EB;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .result.error {
+            color: #DC2626;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2><i class="fa-solid fa-chart-line"></i>Performance Predictor</h2>
+
+    <div class="input-group">
+        <label for="hours" class="sr-only">Hours Studied</label>
+        <input id="hours" type="number" placeholder="Hours Studied" min="0" max="24" aria-label="Hours Studied">
+        <i class="fa-solid fa-clock" aria-hidden="true"></i>
+    </div>
+
+    <div class="input-group">
+        <label for="scores" class="sr-only">Previous Score</label>
+        <input id="scores" type="number" placeholder="Previous Score" min="0" max="100" aria-label="Previous Score">
+        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+    </div>
+
+    <div class="input-group">
+        <label for="sleep" class="sr-only">Sleep Hours</label>
+        <input id="sleep" type="number" placeholder="Sleep Hours" min="0" max="24" aria-label="Sleep Hours">
+        <i class="fa-solid fa-bed" aria-hidden="true"></i>
+    </div>
+
+    <div class="input-group">
+        <label for="papers" class="sr-only">Sample Papers Solved</label>
+        <input id="papers" type="number" placeholder="Sample Papers Solved" min="0" aria-label="Sample Papers Solved">
+        <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+    </div>
+
+    <div class="input-group">
+        <label for="extra" class="sr-only">Extracurricular</label>
+        <select id="extra" aria-label="Extracurricular">
+            <option value="true">Extracurricular: Yes</option>
+            <option value="false">Extracurricular: No</option>
+        </select>
+        <i class="fa-solid fa-futbol" aria-hidden="true"></i>
+    </div>
+
+    <button type="button" onclick="predict()">
+        <i class="fa-solid fa-magic"></i> Predict
+    </button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function predict() {
+    const resultEl = document.getElementById('result');
+    resultEl.classList.remove('show', 'error');
+
+    const hoursVal = Number(document.getElementById('hours').value) || 0;
+    const scoresVal = Number(document.getElementById('scores').value) || 0;
+    const sleepVal = Number(document.getElementById('sleep').value) || 0;
+    const papersVal = Number(document.getElementById('papers').value) || 0;
+    const extraEl = document.getElementById('extra');
+
+    fetch('/api/predict/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            hours_studied: hoursVal,
+            previous_scores: scoresVal,
+            sleep_hours: sleepVal,
+            sample_papers: papersVal,
+            extracurricular: extraEl.value === "true"
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            resultEl.textContent = (data.cause || data.error);
+            resultEl.classList.add('show', 'error');
+        } else if (typeof data.predicted_performance_index !== 'undefined') {
+            resultEl.textContent = "Predicted Performance Index: " + data.predicted_performance_index;
+            resultEl.classList.add('show');
+        } else {
+            resultEl.textContent = "Unexpected response.";
+            resultEl.classList.add('show', 'error');
+        }
+    })
+    .catch(() => {
+        resultEl.textContent = "Network error. Please try again.";
+        resultEl.classList.add('show', 'error');
+    });
+}
+</script>
+
+</body>
+</html>
